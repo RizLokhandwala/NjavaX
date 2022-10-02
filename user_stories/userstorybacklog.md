@@ -17,8 +17,11 @@ As a user, I enter a URL into my browser to request to read from a server.
 
 ## Stories for Web Server
 ### Fetch a Web page with file option on it
-As a user I enter the URL for a web page on the NjavaX server so I may select options on it.)
-(The server produces the file)
+As a user I enter the URL for a web page on the NjavaX server so I may select options on it.
+(The server produces the file)\
+### Request a file but the file is not there
+As a user I enter the URL for a web page on the NjavaX server so I may select options on it. The file is not there.
+(A "File not found" needs to be displayed on the web page requesting the file)
 ### Fetch a web page through an encripted connection (https)
 As a user I go to a site that uses HTTPS, NjavaX Decrypts and encrypts the data instead of the sites servers each individually doing so.
 
