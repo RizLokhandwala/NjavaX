@@ -61,6 +61,8 @@ public class Server {
 
 
         Path filePath = getFilePath(path);
+        System.out.print(" file path to check: ");
+        System.out.println(filePath);
         if (Files.exists(filePath)) {
             // file exist
             String contentType = guessContentType(filePath);
@@ -83,7 +85,9 @@ public class Server {
         clientOutput.flush();
         client.close();
     }
-
+/*
+ * Modify this for default directory to find files
+ */
     private static Path getFilePath(String path) {
         if ("/".equals(path)) {
             path = "/index.html";
