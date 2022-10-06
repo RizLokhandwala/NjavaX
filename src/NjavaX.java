@@ -10,6 +10,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class NjavaX {
+    public static ServerSocket server;
 public static void main(String[] args) {
         try {
 
