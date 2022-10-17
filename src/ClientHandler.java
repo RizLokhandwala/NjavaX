@@ -1,7 +1,7 @@
 //package WebServer;
 
 import java.io.*;
-import java.net.ServerSocket;
+//import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -11,20 +11,25 @@ import java.util.List;
 
 public class ClientHandler implements Runnable {
 	private final Socket client;
+	private String wDrive;
+	int mode = 1;
 
 	// Constructor
-	public ClientHandler(Socket socket) {
+	public ClientHandler(Socket socket, int mde, String WDrive) {
 		this.client = socket;
+		this.wDrive = WDrive;
+		this.mode = mde;
 	}
 
 	public void run() {
 		PrintWriter out = null;
 		BufferedReader in = null;
+		System.out.println(" Current Thread: "); // + currentThread().getName());
 		try {
 
 			// get the outputstream of client
-			out = new PrintWriter(
-					client.getOutputStream(), true);
+			//out = new PrintWriter(
+			//		client.getOutputStream(), true);
 
 			// get the inputstream of client
 			in = new BufferedReader(
@@ -32,13 +37,24 @@ public class ClientHandler implements Runnable {
 							client.getInputStream()));
 
 			String line;
+			if (mode == 2) {
+				if ((line = in.readLine()) != null) {
+					System.out.printf(" read handshake: %s\n", line);
+				} else {
+					System.out.println(" read of handshake failed");
+				}
+				OutputStream clientOutput = client.getOutputStream();
+				clientOutput.write("\r\n\r\n".getBytes());
+				clientOutput.flush();
+			}
 			StringBuilder requestBuilder = new StringBuilder();
 			while (!(line = in.readLine()).isBlank()) {
-				System.out.print("line input: ");
+				System.out.print("-->line input: ");
 				System.out.println(line);
 				requestBuilder.append(line + "\r\n");
-				System.out.println(requestBuilder.toString());
+				//System.out.println(requestBuilder.toString());
 			}
+			System.out.println(" end of reading");
 			String request = requestBuilder.toString();
 			String[] requestsLines = request.split("\r\n");
 			String[] requestLine = requestsLines[0].split(" ");
@@ -69,17 +85,8 @@ public class ClientHandler implements Runnable {
 				byte[] notFoundContent = "<h1>File Not found :(</h1>".getBytes();
 				sendResponse(client, "404 Not Found", "text/html", notFoundContent);
 			}
-			/*
-			 * while ((line = in.readLine()) != null) {
-			 * 
-			 * // writing the received message from
-			 * // client
-			 * System.out.printf(
-			 * " Sent from the client: %s\n",
-			 * line);
-			 * out.println(line);
-			 * }
-			 */
+			
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
@@ -99,6 +106,7 @@ public class ClientHandler implements Runnable {
 
 	private static void sendResponse(Socket client, String status, String contentType, byte[] content)
 			throws IOException {
+	    System.out.println(" > ****** SendResponse Called");
 		OutputStream clientOutput = client.getOutputStream();
 		clientOutput.write(("HTTP/1.1 \r\n" + status).getBytes());
 		clientOutput.write(("ContentType: " + contentType + "\r\n").getBytes());
@@ -112,15 +120,15 @@ public class ClientHandler implements Runnable {
 	/*
 	 * Modify this for default directory to find files
 	 */
-	private static Path getFilePath(String path) {
+	private Path getFilePath(String path) {
 		if ("/".equals(path)) {
 			path = "/index.html";
 		}
-
-		return Paths.get("/tmp/webpagefiles", path);
+		String directory = wDrive + "/tmp/webpagefiles";
+		return Paths.get(directory, path);
 	}
 
-	private static String guessContentType(Path filePath) throws IOException {
+	private String guessContentType(Path filePath) throws IOException {
 		System.out.print(" content type: ");
 		System.out.println(Files.probeContentType(filePath));
 		return Files.probeContentType(filePath);
