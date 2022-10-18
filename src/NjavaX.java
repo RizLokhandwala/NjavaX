@@ -128,7 +128,7 @@ public class NjavaX {
                                 .getHostAddress());
 
                 // get IP address and port number of the server for which we are a procy
-                String pIP = "192.168.1.106"; // IP address of partner (this program on server)
+                String pIP = "127.0.0.1"; // IP address of partner (this program on server)
                 int pPort = 8090;
                 // create a new thread object
                 ProxyDutiesHandler ProxySock = new ProxyDutiesHandler(client, pIP, pPort);

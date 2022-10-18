@@ -12,7 +12,7 @@ import java.util.List;
 public class ClientHandler implements Runnable {
 	private final Socket client;
 	private String wDrive;
-	int mode = 1;
+	int mode = 0;
 
 	// Constructor
 	public ClientHandler(Socket socket, int mde, String WDrive) {
@@ -37,7 +37,7 @@ public class ClientHandler implements Runnable {
 							client.getInputStream()));
 
 			String line;
-			if (mode == 2) {
+			/*if (mode == 2) {
 				if ((line = in.readLine()) != null) {
 					System.out.printf(" read handshake: %s\n", line);
 				} else {
@@ -46,7 +46,7 @@ public class ClientHandler implements Runnable {
 				OutputStream clientOutput = client.getOutputStream();
 				clientOutput.write("\r\n\r\n".getBytes());
 				clientOutput.flush();
-			}
+			}*/
 			StringBuilder requestBuilder = new StringBuilder();
 			while (!(line = in.readLine()).isBlank()) {
 				System.out.print("-->line input: ");

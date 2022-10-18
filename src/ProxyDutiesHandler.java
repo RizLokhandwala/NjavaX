@@ -67,6 +67,7 @@ public class ProxyDutiesHandler implements Runnable {
 				OutputStreampartner.write(Request, 0, Bytes_Read);
 				OutputStreampartner.flush();
 			}
+			System.out.println(" -- end of reading from client, now write");
 
 			while ((Bytes_Read = InputStreampartner.read(Reply)) != -1) {
 				OutputStreamClient.write(Reply, 0, Bytes_Read);
