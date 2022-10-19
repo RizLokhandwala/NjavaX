@@ -30,16 +30,13 @@ public class ProxyDutiesHandler implements Runnable {
 		topartner = null;
 		PrintWriter outtopartner = null;
 
-		InputStream InputStreamClient = null;
-		OutputStream OutputStreamClient = null;
-		InputStream InputStreampartner = null;
-		OutputStream OutputStreampartner = null;
+		//InputStream InputStreamClient = null;
+		//OutputStream OutputStreamClient = null;
+		//InputStream InputStreampartner = null;
+		//OutputStream OutputStreampartner = null;
 		final byte[] Request = new byte[4096];
 		final byte[] Reply = new byte[4096];
-		/*
-		 * First select a server to send to
-		 * 
-		 */
+		
 
 		try {
 			
@@ -50,33 +47,59 @@ public class ProxyDutiesHandler implements Runnable {
 			System.out.print(" topartner: ");
 			System.out.print(topartner.toString());
 
-			InputStreamClient = client.getInputStream();
-			OutputStreamClient = client.getOutputStream();
+			final InputStream InputStreamClient = client.getInputStream();
+			final OutputStream OutputStreamClient = client.getOutputStream();
 
-			InputStreampartner = topartner.getInputStream();
-			OutputStreampartner = topartner.getOutputStream();
+			//final InputStream InputStreampartner = topartner.getInputStream();
+			//final OutputStream OutputStreampartner = topartner.getOutputStream();
+
+			final InputStream InputStreampartner = topartner.getInputStream();
+			final OutputStream OutputStreampartner = topartner.getOutputStream();
+
+			Thread New_Thread = new Thread() {
+				
+			/*------------------------------------------------------------------- */	
+				public void run() {
+					int Bytes_Read;
+					System.out.println(" Thread started ");
+					try {						// try read write
+						while ((Bytes_Read = InputStreamClient.read(Request)) != -1) {
+							System.out.printf(" Request Bytes read: %d\n",Bytes_Read);
+							OutputStreampartner.write(Request, 0, Bytes_Read);
+							OutputStreampartner.flush();
+						}
+						
+					} catch (IOException e) {
+						e.printStackTrace();
+					} 
+
+					// Close the connections
+					try {
+						OutputStreampartner.close();
+					} catch (IOException e) {
+					}
+				}
+			};
+		// client-to-server request thread
+			New_Thread.start();
+			/* END Thread */
+			/*------------------------------------------------------------------- */
+			int Bytes_Read;
+			try {								// try read write
+				while ((Bytes_Read = InputStreampartner.read(Reply)) != -1) {
+					System.out.printf(" Reply Bytes read: %d\n",Bytes_Read);
+					OutputStreamClient.write(Reply, 0, Bytes_Read);
+					OutputStreamClient.flush();
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			// Close the connection
+			OutputStreamClient.close();
 
 		} catch (Exception e) {
 			System.out.println(" **************>>>>>>>>Error with server socket <<<<<<<<<<<<<<<<<<<");
 			System.out.println(e.toString());
-		}
-
-		int Bytes_Read;
-		try {
-			while ((Bytes_Read = InputStreamClient.read(Request)) != -1) {
-				OutputStreampartner.write(Request, 0, Bytes_Read);
-				OutputStreampartner.flush();
-			}
-			System.out.println(" -- end of reading from client, now write");
-
-			while ((Bytes_Read = InputStreampartner.read(Reply)) != -1) {
-				OutputStreamClient.write(Reply, 0, Bytes_Read);
-				OutputStreamClient.flush();
-			}
-
-		
-		} catch (IOException e) {
-			e.printStackTrace();
 		} finally {
 			try {
 				if (outtoclient != null) {

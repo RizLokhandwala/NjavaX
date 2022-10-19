@@ -33,7 +33,6 @@ public class NjavaX {
          */
         int mode = 0;
 
-
         String wDrive = "";
         String os = System.getProperty("os.name");
         System.out.println(" OS: " + os);
@@ -41,6 +40,7 @@ public class NjavaX {
             wDrive = "C:";
         }
         // DEBUG
+        /* 
         String name = wDrive + "/tmp/webpagefiles";
         System.out.println(" name is " + name);
         Path filePath = Paths.get(name, "index.html");
@@ -50,6 +50,7 @@ public class NjavaX {
             System.out.println(" debug file www does not exist");
         }
         // END DEbug
+        */
         System.out.println(String.format(" Mode: %d", mode));
         int portno = 8080;
         if (mode == 2) {
@@ -73,8 +74,8 @@ public class NjavaX {
                 // requests
                 if (mode == 0)
                     System.out.println("WEb server before accept");
-                else 
-                    System.out.println("Proxy partner before accept");
+                else
+                    System.out.printf("Proxy partner before accept on port no: %d\n", portno);
                 Socket client = server.accept();
 
                 // Displaying that new client is connected
@@ -118,7 +119,7 @@ public class NjavaX {
 
                 // socket object to receive incoming client
                 // requests
-                System.out.println("Proxy server before accept");
+                System.out.printf("Proxy server before accept on port %d\n", portno);
                 Socket client = server.accept();
 
                 // Displaying that new client is connected
@@ -128,7 +129,11 @@ public class NjavaX {
                                 .getHostAddress());
 
                 // get IP address and port number of the server for which we are a procy
-                String pIP = "127.0.0.1"; // IP address of partner (this program on server)
+                /*
+                 * First select a server to send to
+                 * 
+                 */
+                String pIP = "localhost"; // IP address of partner (this program on server)
                 int pPort = 8090;
                 // create a new thread object
                 ProxyDutiesHandler ProxySock = new ProxyDutiesHandler(client, pIP, pPort);
