@@ -9,11 +9,14 @@ public class ConfigReader {
         BufferedReader configReader
             = new BufferedReader(new FileReader(configFile));
         
-        String st;
+        String curLine;
+        String trimmedLine;
+        String[] lineArgs;
 
-        while ((st = configReader.readLine()) != null)
-            System.out.println(st);
-
+        while ((curLine = configReader.readLine()) != null) {
+            trimmedLine = curLine.trim().replaceAll(" +", " ").replaceAll(" \\{", "\\{");
+        }
+            
         configReader.close();
     }
 }
