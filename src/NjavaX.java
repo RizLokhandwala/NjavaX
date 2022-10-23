@@ -18,6 +18,7 @@ public class NjavaX {
     public static ServerSocket server;
 
     public static void main(String[] args) {
+        
 
         /*
          * Program may run in one of three modes....
@@ -25,13 +26,18 @@ public class NjavaX {
          * 1 -- program is proxy server
          * it listens on 8080 and writes to counterpart on server in a socket number
          * specifed in the config file
-         * 2 -- It is the counter part runnin on the final server
+         * 2 -- It is the counter part running on the final server
          * 
          * NOTE: The config file will provide the mode and if in mode 1 a list of
          * IP address: port numbers
          * if in mode 2 it just provides a port number to listen
          */
+
+        System.out.printf(" args: %s \n",args[0]);
+        
         int mode = 0;
+        // should set mode from GlobalInfo
+        ParseCommandArgs(args);
 
         String wDrive = "";
         String os = System.getProperty("os.name");
@@ -154,6 +160,44 @@ public class NjavaX {
                 }
             }
         }
+
+    }
+    private static int ParseCommandArgs(String[] args)
+    {
+        int len = args.length -1; // zero based offset
+        System.out.printf(" length of args array is %d\n",len);
+        int index = 0;
+        int m = -1;
+        String configfile = "";
+        String landing = "";
+        while (index < len) {
+            if ((args[index].equalsIgnoreCase("mode")) || (args[index].equalsIgnoreCase("-mode")))  {
+                try {
+                    m = Integer.parseInt(args[index+1]);
+                }
+                catch (NumberFormatException e) {
+                    m = 0;
+                    System.out.printf(" error in mode number specification -- setting to %d\n",m);
+                }
+                index = index + 2;
+            }
+            else if ((args[index].equalsIgnoreCase("config")) || (args[index].equalsIgnoreCase("-config")))  {
+                    configfile = args[index+1];
+                    index = index + 2;
+            } else if ((args[index].equalsIgnoreCase("landing")) || (args[index].equalsIgnoreCase("-landing")))  {
+                landing = args[index+1];
+                index = index + 2;
+            } else {
+                System.out.printf(" ERROR invalid command line arg:  %s,  -- not processing the rest\n",args[index]);
+                index = index + len;
+            }
+
+        }
+        System.out.printf(" mode set to %d\n",m);
+        System.out.printf(" cofig file set to: %s\n",configfile);
+        System.out.printf(" landing folder set to %s\n",landing);
+        return m; // should return mode
+         
 
     }
 
