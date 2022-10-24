@@ -31,13 +31,12 @@ public class NjavaX {
          * NOTE: The config file will provide the mode and if in mode 1 a list of
          * IP address: port numbers
          * if in mode 2 it just provides a port number to listen
+         * 
          */
-
-        System.out.printf(" args: %s \n",args[0]);
         
         int mode = 0;
         // should set mode from GlobalInfo
-        ParseCommandArgs(args);
+        mode = ParseCommandArgs(args);
 
         String wDrive = "";
         String os = System.getProperty("os.name");
@@ -164,6 +163,11 @@ public class NjavaX {
     }
     private static int ParseCommandArgs(String[] args)
     {
+        // quick out if no command line args
+        if (args.length < 2) {
+            System.out.println(" no command line arguments to process");
+            return 0;
+        }
         int len = args.length -1; // zero based offset
         System.out.printf(" length of args array is %d\n",len);
         int index = 0;
