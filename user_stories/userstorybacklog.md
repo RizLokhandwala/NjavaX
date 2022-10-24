@@ -1,4 +1,8 @@
 # User Story Backlog
+## General Use Stories
+### Pass command line arguments
+As a user I invoke the program in mode 2 with landing /temp/mypages 
+The systax is <p> java NjavaX mode 2 landing /temp </p>
 ## User Stories for Proxy Server
 ### Pass a URL to another server
 As a user I enter an URL into my browser that request a read from a server so I can see the web page.
