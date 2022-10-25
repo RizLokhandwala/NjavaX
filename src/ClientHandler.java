@@ -25,6 +25,7 @@ public class ClientHandler implements Runnable {
 		PrintWriter out = null;
 		BufferedReader in = null;
 		System.out.println(" Current Thread: "); // + currentThread().getName());
+		GlobalInfo infoHolder = GlobalInfo.getInstance();
 		try {
 
 			// get the outputstream of client
@@ -37,16 +38,7 @@ public class ClientHandler implements Runnable {
 							client.getInputStream()));
 
 			String line;
-			/*if (mode == 2) {
-				if ((line = in.readLine()) != null) {
-					System.out.printf(" read handshake: %s\n", line);
-				} else {
-					System.out.println(" read of handshake failed");
-				}
-				OutputStream clientOutput = client.getOutputStream();
-				clientOutput.write("\r\n\r\n".getBytes());
-				clientOutput.flush();
-			}*/
+			
 			StringBuilder requestBuilder = new StringBuilder();
 			while (!(line = in.readLine()).isBlank()) {
 				System.out.print("-->line input: ");
@@ -69,11 +61,16 @@ public class ClientHandler implements Runnable {
 				headers.add(header);
 			}
 
-			String accessLog = String.format("==>Client %s, method %s, path %s, version %s, host %s, headers %s",
-					client.toString(), method, path, version, host, headers.toString());
-			System.out.println(accessLog);
+			//DEBUG
+			//String accessLog = String.format("==>Client %s, method %s, path %s, version %s, host %s, headers %s",
+			//		client.toString(), method, path, version, host, headers.toString());
+			//System.out.println(accessLog);
+			//END DEBUG
 
-			Path filePath = getFilePath(path);
+			String directory = infoHolder.getWdrive() +   infoHolder.getLandingPath();
+			///System.out.printf("------->DEBUG directory: %s,\n",directory);
+
+			Path filePath = getFilePath(directory, path);
 			System.out.print(" file path to check: ");
 			System.out.println(filePath);
 			if (Files.exists(filePath)) {
@@ -88,6 +85,7 @@ public class ClientHandler implements Runnable {
 			
 			
 		} catch (IOException e) {
+			System.out.println(" IO Exception");
 			e.printStackTrace();
 		} finally {
 			try {
@@ -120,11 +118,11 @@ public class ClientHandler implements Runnable {
 	/*
 	 * Modify this for default directory to find files
 	 */
-	private Path getFilePath(String path) {
+	private Path getFilePath(String directory, String path) {
 		if ("/".equals(path)) {
 			path = "/index.html";
 		}
-		String directory = wDrive + "/tmp/webpagefiles";
+		//String directory = wDrive + "/tmp/webpagefiles";
 		return Paths.get(directory, path);
 	}
 

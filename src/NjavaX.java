@@ -9,10 +9,12 @@
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketAddress;
+import java.net.InetSocketAddress;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.Path;
+//import java.nio.file.Files;
+//mport java.nio.file.Paths;
+//import java.nio.file.Path;
 
 public class NjavaX {
     public static ServerSocket server;
@@ -34,35 +36,39 @@ public class NjavaX {
          * 
          */
         
-        int mode = 0;
-        // should set mode from GlobalInfo
-        mode = ParseCommandArgs(args);
+
+        GlobalInfo infoHolder = GlobalInfo.getInstance();
 
         String wDrive = "";
         String os = System.getProperty("os.name");
         System.out.println(" OS: " + os);
         if (os.contains("Windows")) {
-            wDrive = "C:";
+            infoHolder.setWdrive("C:");
         }
-        // DEBUG
-        /* 
-        String name = wDrive + "/tmp/webpagefiles";
-        System.out.println(" name is " + name);
-        Path filePath = Paths.get(name, "index.html");
-        if (Files.exists(filePath)) {
-            System.out.println(" debug file exists");
-        } else {
-            System.out.println(" debug file www does not exist");
-        }
-        // END DEbug
-        */
-        System.out.println(String.format(" Mode: %d", mode));
-        int portno = 8080;
-        if (mode == 2) {
-            portno = 8090; // This 8090 is for testing -- port number is actually in config file
-        }
+    
+        ParseCommandArgs(args);
+        //
+        // Read config file here
+        //
+        //
+        // now set new default mode 
+        int mode = infoHolder.getMode();
+
+        // if mode == 2, and port number has not been set -- set it to 8090;
+        // if it has been set, or if mode is not 2, then just return the port number.
+        
+        int portno = infoHolder.ConditionalSetDefaultPort();
+        
+        System.out.println("*******************************************************************");
+        System.out.println("* Parameters are set as follows:");
+        System.out.printf("*  mode set to %d,\n",infoHolder.getMode());
+        System.out.printf("*  port set to %d,\n",infoHolder.getPortno());
+        System.out.printf("*  cofig file set to: %s,\n",infoHolder.getConfigPath());
+        System.out.printf("*  landing folder set to %s,\n",infoHolder.getLandingPath());
+        System.out.println("*******************************************************************\n");
+
         if (mode == 1) {
-            runProxyServer(portno, wDrive);
+            runProxyServer();
         }
 
         try {
@@ -84,10 +90,12 @@ public class NjavaX {
                 Socket client = server.accept();
 
                 // Displaying that new client is connected
-                // to server
-                System.out.println("New client connected"
-                        + client.getInetAddress()
-                                .getHostAddress());
+                // to server.  Trying to find the IP of the connected
+                String clientIpAddress = ((InetSocketAddress) client.getRemoteSocketAddress()).getAddress().toString();
+                System.out.printf("New client connected, remote addr: %s\n",clientIpAddress);
+                
+                System.out.printf("New client connected, inet: %s\n",client.getInetAddress());
+                System.out.printf("New client connected: Host: %s\n",client.getInetAddress().getHostAddress());
 
                 // create a new thread object
                 ClientHandler clientSock = new ClientHandler(client, mode, wDrive);
@@ -111,11 +119,14 @@ public class NjavaX {
 
     }
 
-    private static void runProxyServer(int portno, String wDrive) {
-        try {
+    private static void runProxyServer() {
 
-            // server is listening on port 8080
-            server = new ServerSocket(portno);
+        GlobalInfo infoHolder = GlobalInfo.getInstance();
+        int portNo = infoHolder.getPortno();
+        //String wDrive = infoHolder.getWdrive();
+        try {            
+            // server is listening on port 8080 or specified
+            server = new ServerSocket(portNo);
             // server.setReuseAddress(true);
 
             // running infinite loop for getting
@@ -124,18 +135,19 @@ public class NjavaX {
 
                 // socket object to receive incoming client
                 // requests
-                System.out.printf("Proxy server before accept on port %d\n", portno);
+                System.out.printf("Proxy server before accept on port %d\n",portNo);
                 Socket client = server.accept();
 
                 // Displaying that new client is connected
                 // to server
-                System.out.println("New client connected"
-                        + client.getInetAddress()
-                                .getHostAddress());
+                System.out.printf("New client connected, inet: %s\n",client.getInetAddress());
+                System.out.printf("New client connected, Host: %s\n",client.getInetAddress().getHostAddress());
 
                 // get IP address and port number of the server for which we are a procy
                 /*
-                 * First select a server to send to
+                 * NOTE:
+                 *      First select a server to send to...
+                 *      May be round robin, or may be based on header info 
                  * 
                  */
                 String pIP = "localhost"; // IP address of partner (this program on server)
@@ -161,35 +173,50 @@ public class NjavaX {
         }
 
     }
-    private static int ParseCommandArgs(String[] args)
+    private static void ParseCommandArgs(String[] args)
     {
         // quick out if no command line args
         if (args.length < 2) {
             System.out.println(" no command line arguments to process");
-            return 0;
         }
+
+        GlobalInfo infoHolder = GlobalInfo.getInstance();
+
+
         int len = args.length -1; // zero based offset
-        System.out.printf(" length of args array is %d\n",len);
+        //System.out.printf(" length of args array is %d\n",len);
         int index = 0;
         int m = -1;
+        int portno = 0;
         String configfile = "";
         String landing = "";
         while (index < len) {
             if ((args[index].equalsIgnoreCase("mode")) || (args[index].equalsIgnoreCase("-mode")))  {
                 try {
                     m = Integer.parseInt(args[index+1]);
+                    infoHolder.setMode(m);
                 }
                 catch (NumberFormatException e) {
-                    m = 0;
-                    System.out.printf(" error in mode number specification -- setting to %d\n",m);
+                    System.out.printf(" error in mode number specification -- using default: %d\n",infoHolder.getMode());
+                }
+                infoHolder.setMode(m);
+                index = index + 2;
+            } else if ((args[index].equalsIgnoreCase("portno")) || (args[index].equalsIgnoreCase("-portno")))  {
+                try {
+                    portno = Integer.parseInt(args[index+1]);
+                    infoHolder.setPortNo(portno);
+                }
+                catch (NumberFormatException e) {
+                    System.out.printf(" error in port specification -- using default %d\n",infoHolder.getPortno());
                 }
                 index = index + 2;
-            }
-            else if ((args[index].equalsIgnoreCase("config")) || (args[index].equalsIgnoreCase("-config")))  {
+            } else if ((args[index].equalsIgnoreCase("config")) || (args[index].equalsIgnoreCase("-config")))  {
                     configfile = args[index+1];
+                    infoHolder.setConfigPath(configfile);
                     index = index + 2;
             } else if ((args[index].equalsIgnoreCase("landing")) || (args[index].equalsIgnoreCase("-landing")))  {
                 landing = args[index+1];
+                infoHolder.setLandingPath(landing);
                 index = index + 2;
             } else {
                 System.out.printf(" ERROR invalid command line arg:  %s,  -- not processing the rest\n",args[index]);
@@ -197,12 +224,9 @@ public class NjavaX {
             }
 
         }
-        System.out.printf(" mode set to %d\n",m);
-        System.out.printf(" cofig file set to: %s\n",configfile);
-        System.out.printf(" landing folder set to %s\n",landing);
-        return m; // should return mode
+        
+       
+        return; 
          
-
     }
-
 }
