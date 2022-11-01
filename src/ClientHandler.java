@@ -10,21 +10,26 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ClientHandler implements Runnable {
+	static int instanceCount = 0;
 	private final Socket client;
 	private String wDrive;
 	int mode = 0;
 
 	// Constructor
-	public ClientHandler(Socket socket, int mde, String WDrive) {
+	public ClientHandler(Socket socket, int mde, String WDrive) 
+	{
 		this.client = socket;
 		this.wDrive = WDrive;
 		this.mode = mde;
+		instanceCount = instanceCount + 1;
 	}
 
-	public void run() {
+	public void run()
+	{
 		PrintWriter out = null;
 		BufferedReader in = null;
 		System.out.println(" Current Thread: "); // + currentThread().getName());
+		System.out.printf("+++Instance count: %d\n",instanceCount);
 		GlobalInfo infoHolder = GlobalInfo.getInstance();
 		try {
 
