@@ -41,7 +41,7 @@ public class ProxyDutiesHandler implements Runnable {
 		try {
 			
 			System.out.println(
-					String.format(" In Proxyduties Server for connection to IP: %s Port: %d", partner_IP, partner_Port));
+					String.format(" In ProxydutiesServer for connection to IP: %s Port: %d", partner_IP, partner_Port));
 
 			topartner = new Socket(partner_IP, partner_Port);
 			System.out.print(" topartner: ");
@@ -70,14 +70,14 @@ public class ProxyDutiesHandler implements Runnable {
 						}
 						
 					} catch (IOException e) {
-						e.printStackTrace();
+						System.out.println(e.getMessage());
+						//e.printStackTrace();
 					} 
 
 					// Close the connections
 					try {
 						OutputStreampartner.close();
-					} catch (IOException e) {
-					}
+					} catch (IOException e) { }
 				}
 			};
 		// client-to-server request thread
@@ -92,7 +92,8 @@ public class ProxyDutiesHandler implements Runnable {
 					OutputStreamClient.flush();
 				}
 			} catch (IOException e) {
-				e.printStackTrace();
+				System.out.println(e.getMessage());
+				//e.printStackTrace();
 			}
 			// Close the connection
 			OutputStreamClient.close();
