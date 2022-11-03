@@ -10,16 +10,10 @@ class Test1{
         instance.addServerEntry("localhost", 8080);
         instance.addServerEntry("127.12.12.1", 8080);
         instance.addServerEntry("192.120.6.1", 8081);
-        //int[] serverInfo = new int[]{2, 0};
         int index = 0;
-        //Two two = new Two();
-        //x = two.fxn(x);
-        //List<Object> serverInfo = new ArraysList<Object>();
-        //List<ServerEntry> entryList = new ArrayList<ServerEntry> (); 
+        
         Test1.returnInfo(index);
         int x = changeIndex(index);
-        //System.out.printf(x);
-        //int[] x = changeIndex(serverInfo[0], serverInfo[1], serverInfo);
         //System.out.printf("Index changed to %s\n",x[0]);
         //System.out.printf("Index changed to %s\n",x[1]);
         
@@ -76,15 +70,4 @@ class Test1{
     //     return serverInfo;
     // }
      
-    //  public static List returnPn(int b)
-    // {
-    //     GlobalInfo instance = GlobalInfo.getInstance();
-    //     instance.addServerEntry("localhost", 8080);
-    //     instance.addServerEntry("127.12.12.1", 8080);
-    //     instance.addServerEntry("192.120.6.1", 8081);
-    //     //int num = instance.getNumServerEntries();
-    //     List<Object> rvalue = instance.getEntry(b);
-    //     System.out.printf("Returned %s\n",rvalue.get(b));
-    //     return rvalue;
-    //  }
 }
