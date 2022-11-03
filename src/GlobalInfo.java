@@ -78,8 +78,10 @@ public class GlobalInfo {
     // if the port has not been set and the mode is one the default is 8090
     int ConditionalSetDefaultPort() 
     {
-        if (portSet)
-            return portNo;;
+        if (portSet) {
+            System.out.println(" port has been set already");
+            return portNo;
+        }
         if (mode == 2)
             portNo = 8090;
         return portNo;

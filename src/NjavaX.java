@@ -68,7 +68,7 @@ public class NjavaX {
         System.out.println("*******************************************************************\n");
 
         if (mode == 1) {
-            runProxyServer();
+            runReverseProxyServer();
         }
 
         try {
@@ -93,9 +93,8 @@ public class NjavaX {
                 // to server.  Trying to find the IP of the connected
                 String clientIpAddress = ((InetSocketAddress) client.getRemoteSocketAddress()).getAddress().toString();
                 System.out.printf("New client connected, remote addr: %s\n",clientIpAddress);
-                
-                System.out.printf("New client connected, inet: %s\n",client.getInetAddress());
-                System.out.printf("New client connected: Host: %s\n",client.getInetAddress().getHostAddress());
+                //System.out.printf("New client connected, inet: %s\n",client.getInetAddress());
+                //System.out.printf("New client connected: Host: %s\n",client.getInetAddress().getHostAddress());
 
                 // create a new thread object
                 ClientHandler clientSock = new ClientHandler(client, mode, wDrive);
@@ -119,10 +118,23 @@ public class NjavaX {
 
     }
 
-    private static void runProxyServer() {
+    private static void runReverseProxyServer() {
 
         GlobalInfo infoHolder = GlobalInfo.getInstance();
         int portNo = infoHolder.getPortno();
+        String lastIPConnected = "";
+        boolean isLoadBalance = false;
+        String pIP = "localhost"; // IP address of partner (this program on server)
+        int pPort = 8090;
+
+        if (infoHolder.getNumServerEntries() > 1) {
+            isLoadBalance = true;
+        }
+        if (infoHolder.getNumServerEntries() == 1) { // no servers entered at all
+            // REMOVE THIS CODE AND REPLACE WITH GET FROM GLOBALINFO
+            pIP = "localhost"; // IP address of partner (this program on server)
+            pPort = 8090;
+        }
         //String wDrive = infoHolder.getWdrive();
         try {            
             // server is listening on port 8080 or specified
@@ -138,20 +150,26 @@ public class NjavaX {
                 System.out.printf("Proxy server before accept on port %d\n",portNo);
                 Socket client = server.accept();
 
+                // NOTE: we only care about the last connection if we are doing load balancing
                 // Displaying that new client is connected
                 // to server
-                System.out.printf("New client connected, inet: %s\n",client.getInetAddress());
-                System.out.printf("New client connected, Host: %s\n",client.getInetAddress().getHostAddress());
 
-                // get IP address and port number of the server for which we are a procy
+                String connectedIp = client.getInetAddress().getHostAddress();
+                if (!lastIPConnected.equalsIgnoreCase(connectedIp)) {   /// new connection
+                    System.out.println("*+*+*+*+*+ new connection");
+                    lastIPConnected = connectedIp;
+                }
+                System.out.printf("New client connected, inet: %s\n",client.getInetAddress());
+                //System.out.printf("New client connected, Host: %s\n",client.getInetAddress().getHostAddress());
+
+                // get IP address and port number of the server for which we are a proxy
                 /*
                  * NOTE:
                  *      First select a server to send to...
                  *      May be round robin, or may be based on header info 
                  * 
                  */
-                String pIP = "localhost"; // IP address of partner (this program on server)
-                int pPort = 8090;
+                
                 // create a new thread object
                 ProxyDutiesHandler ProxySock = new ProxyDutiesHandler(client, pIP, pPort);
 
@@ -225,8 +243,8 @@ public class NjavaX {
 
         }
         
-       
         return; 
          
     }
+    
 }

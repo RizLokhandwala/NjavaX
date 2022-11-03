@@ -14,6 +14,7 @@ public class ProxyDutiesHandler implements Runnable {
 	private Socket topartner;
 	private String partner_IP;
 	private int partner_Port;
+	private static int instanceCount = 0;
 
 	// Constructor
 	public ProxyDutiesHandler(Socket socket, String pIP, int pPort) {
@@ -21,6 +22,7 @@ public class ProxyDutiesHandler implements Runnable {
 		this.topartner = null;
 		this.partner_IP = pIP;
 		this.partner_Port = pPort;
+		instanceCount = instanceCount + 1;
 	}
 
 	public void run() {
@@ -30,70 +32,71 @@ public class ProxyDutiesHandler implements Runnable {
 		topartner = null;
 		PrintWriter outtopartner = null;
 
-		//InputStream InputStreamClient = null;
-		//OutputStream OutputStreamClient = null;
-		//InputStream InputStreampartner = null;
-		//OutputStream OutputStreampartner = null;
+		// InputStream InputStreamClient = null;
+		// OutputStream OutputStreamClient = null;
+		// InputStream InputStreampartner = null;
+		// OutputStream OutputStreampartner = null;
 		final byte[] Request = new byte[4096];
 		final byte[] Reply = new byte[4096];
-		
 
 		try {
-			
+
 			System.out.println(
 					String.format(" In ProxydutiesServer for connection to IP: %s Port: %d", partner_IP, partner_Port));
 
 			topartner = new Socket(partner_IP, partner_Port);
 			System.out.print(" topartner: ");
-			System.out.print(topartner.toString());
+			System.out.println(topartner.toString());
+			System.out.printf(" >+=+=+=+=+=> instance count: %d", instanceCount);
 
 			final InputStream InputStreamClient = client.getInputStream();
 			final OutputStream OutputStreamClient = client.getOutputStream();
 
-			//final InputStream InputStreampartner = topartner.getInputStream();
-			//final OutputStream OutputStreampartner = topartner.getOutputStream();
+			// final InputStream InputStreampartner = topartner.getInputStream();
+			// final OutputStream OutputStreampartner = topartner.getOutputStream();
 
 			final InputStream InputStreampartner = topartner.getInputStream();
 			final OutputStream OutputStreampartner = topartner.getOutputStream();
 
 			Thread New_Thread = new Thread() {
-				
-			/*------------------------------------------------------------------- */	
+
+				/*------------------------------------------------------------------- */
 				public void run() {
 					int Bytes_Read;
 					System.out.println(" Thread started ");
-					try {						// try read write
+					try { // try read write
 						while ((Bytes_Read = InputStreamClient.read(Request)) != -1) {
-							System.out.printf(" Request Bytes read: %d\n",Bytes_Read);
+							System.out.printf(" Request Bytes read: %d\n", Bytes_Read);
 							OutputStreampartner.write(Request, 0, Bytes_Read);
 							OutputStreampartner.flush();
 						}
-						
+
 					} catch (IOException e) {
 						System.out.println(e.getMessage());
-						//e.printStackTrace();
-					} 
+						// e.printStackTrace();
+					}
 
 					// Close the connections
 					try {
 						OutputStreampartner.close();
-					} catch (IOException e) { }
+					} catch (IOException e) {
+					}
 				}
 			};
-		// client-to-server request thread
+			// client-to-server request thread
 			New_Thread.start();
 			/* END Thread */
 			/*------------------------------------------------------------------- */
 			int Bytes_Read;
-			try {								// try read write
+			try { // try read write
 				while ((Bytes_Read = InputStreampartner.read(Reply)) != -1) {
-					System.out.printf(" Reply Bytes read: %d\n",Bytes_Read);
+					System.out.printf(" Reply Bytes read: %d\n", Bytes_Read);
 					OutputStreamClient.write(Reply, 0, Bytes_Read);
 					OutputStreamClient.flush();
 				}
 			} catch (IOException e) {
 				System.out.println(e.getMessage());
-				//e.printStackTrace();
+				// e.printStackTrace();
 			}
 			// Close the connection
 			OutputStreamClient.close();
@@ -115,16 +118,19 @@ public class ProxyDutiesHandler implements Runnable {
 			}
 		}
 	}
-	/*private static void sendResponse(Socket partner, String status, String contentType, byte[] content)
-			throws IOException {
-	    System.out.println(" > ****** SendResponse Called");
-		OutputStream partnerOutput = partner.getOutputStream();
-		partnerOutput.write(("HTTP/1.1 \r\n" + status).getBytes());
-		partnerOutput.write(("ContentType: " + contentType + "\r\n").getBytes());
-		partnerOutput.write("\r\n".getBytes());
-		partnerOutput.write(content);
-		partnerOutput.write("\r\n\r\n".getBytes());
-		partnerOutput.flush();
-		partner.close();
-	} */
+	/*
+	 * private static void sendResponse(Socket partner, String status, String
+	 * contentType, byte[] content)
+	 * throws IOException {
+	 * System.out.println(" > ****** SendResponse Called");
+	 * OutputStream partnerOutput = partner.getOutputStream();
+	 * partnerOutput.write(("HTTP/1.1 \r\n" + status).getBytes());
+	 * partnerOutput.write(("ContentType: " + contentType + "\r\n").getBytes());
+	 * partnerOutput.write("\r\n".getBytes());
+	 * partnerOutput.write(content);
+	 * partnerOutput.write("\r\n\r\n".getBytes());
+	 * partnerOutput.flush();
+	 * partner.close();
+	 * }
+	 */
 }
