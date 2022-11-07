@@ -7,6 +7,7 @@
  * GAT -- I have made this multithreaded
  */
 import java.io.*;
+import java.util.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketAddress;
@@ -67,6 +68,14 @@ public class NjavaX {
         System.out.printf("*  landing folder set to %s,\n",infoHolder.getLandingPath());
         System.out.println("*******************************************************************\n");
 
+        // DEBUG TEST of map in Global info
+        infoHolder.setProxyEntry("googler", "144.0.0.1", 80);
+        List<Object> rvalue = infoHolder.getProxyEntry("googler");
+        String dbip = rvalue.get(0).toString();
+        int dbport = (int)rvalue.get(1);
+        System.out.printf(" DEbug: returned: %s , %d\n",dbip, dbport);
+        // END DEBUG
+        
         if (mode == 1) {
             runReverseProxyServer();
         }

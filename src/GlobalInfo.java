@@ -3,12 +3,16 @@ import java.util.*;
 
 public class GlobalInfo {
     private static GlobalInfo single_instance = null;
-    private int mode;
-    private int portNo;
-    private Boolean portSet;
-    private String configPath;
-    private String landingPath;
-    private String wDrive;
+    // NOTE:  Some of these are in command line arguments.  
+    // Those with + are may be overridden with cofig file
+    //  Those with ++ are MUST be provided by config file
+    private int mode;               //+explained elsewhere -- see main
+    private int portNo;             //+ This is the port to LISTEN on -- in NginX it is "Listen"
+    private Boolean portSet;        // has the port been set or use default depending on the how the mode is set
+    private String configPath;      // path to read configuration file -- this is a command line argument
+    private String landingPath;     //++ path for landing file -- used in Mode=0, and Mode=2
+    private String wDrive;          // for windows we can specify files not found on "C" drive.
+
     // tuple class -- these are entries of the server list for load balancing
     private class ServerEntry {
         public int flag;
@@ -20,8 +24,22 @@ public class GlobalInfo {
             portNumber = pn;
         }
     }
+    //++ This is the list for load balancing
     List<ServerEntry> entryList = new ArrayList<ServerEntry> (); 
-
+    // 
+    // ==== Experimental Code
+    Map<String,ServerEntry> proxyMap = new HashMap<>();
+    void setProxyEntry(String name, String IP, int portno)
+    {
+        ServerEntry entry = new ServerEntry(IP , portno);
+        proxyMap.put(name,entry);
+    }
+    List<Object> getProxyEntry(String name) 
+    {
+        ServerEntry entry = proxyMap.get(name);
+        return Arrays.asList(entry.hostName, entry.portNumber);
+    }
+        
     // private contstructor -- set all program defaults here
     private GlobalInfo()
     {
