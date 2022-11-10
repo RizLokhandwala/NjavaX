@@ -27,10 +27,11 @@ public class NjavaX {
          * Program may run in one of three modes....
          * 0 -- program is regular web server
          * 1 -- program is proxy server
-         * it listens on 8080 and writes to counterpart on server in a socket number
-         * specifed in the config file
+         *      It listens on 8080 and writes to counterpart on server in a socket number
+         *      specifed in the config file. This may use load balancing.
          * 2 -- It is the counter part running on the final server
-         * 
+         * NOTE (+) is to be added soon
+         * 3(+)-- It is a local proxy -- set system settings to use this as a proxy
          * NOTE: The config file will provide the mode and if in mode 1 a list of
          * IP address: port numbers
          * if in mode 2 it just provides a port number to listen
