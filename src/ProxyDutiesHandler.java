@@ -28,7 +28,7 @@ public class ProxyDutiesHandler implements Runnable {
 	public void run() {
 		PrintWriter outtoclient = null;
 		BufferedReader in = null;
-		BufferedReader infrompartner = null;
+		//BufferedReader infrompartner = null;
 		topartner = null;
 		PrintWriter outtopartner = null;
 

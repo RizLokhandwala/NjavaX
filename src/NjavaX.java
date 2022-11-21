@@ -70,16 +70,21 @@ public class NjavaX {
         System.out.println("*******************************************************************\n");
 
         // DEBUG TEST of map in Global info
-        infoHolder.setProxyEntry("googler", "144.0.0.1", 80);
-        List<Object> rvalue = infoHolder.getProxyEntry("googler");
-        String dbip = rvalue.get(0).toString();
-        int dbport = (int)rvalue.get(1);
-        System.out.printf(" DEbug: returned: %s , %d\n",dbip, dbport);
+        /*infoHolder.setProxyEntry("googler", "144.0.0.1", 80);
+        //List<Object> rvalue = infoHolder.getProxyEntry("googler");
+        //String dbip = rvalue.get(0).toString();
+        //int dbport = (int)rvalue.get(1);
+        //System.out.printf(" DEbug: returned: %s , %d\n",dbip, dbport);
+        */
         // END DEBUG
         
         if (mode == 1) {
             runReverseProxyServer();
         }
+        if (mode == 3) {
+            runProxyServer();
+        }
+        
 
         try {
 
@@ -127,7 +132,7 @@ public class NjavaX {
         }
 
     }
-
+//************************************************************************************************* */
     private static void runReverseProxyServer() {
 
         GlobalInfo infoHolder = GlobalInfo.getInstance();
@@ -157,7 +162,7 @@ public class NjavaX {
 
                 // socket object to receive incoming client
                 // requests
-                System.out.printf("Proxy server before accept on port %d\n",portNo);
+                System.out.printf("Reverse proxy server before accept on port %d\n",portNo);
                 Socket client = server.accept();
 
                 // NOTE: we only care about the last connection if we are doing load balancing
@@ -201,6 +206,56 @@ public class NjavaX {
         }
 
     }
+//************************************************************************************************* */
+    private static void runProxyServer() 
+    {
+        GlobalInfo infoHolder = GlobalInfo.getInstance();
+        int portNo = infoHolder.getPortno();
+        String lastIPConnected = "";
+        try {
+
+            // server is listening on port 8080
+            server = new ServerSocket(portNo);
+            // server.setReuseAddress(true);
+
+            // running infinite loop for getting
+            // client request
+            while (true) {
+
+                // socket object to receive incoming client
+                // requests
+               
+                System.out.printf("Proxy server before accept on port no: %d\n", portNo);
+                Socket client = server.accept();
+
+                // Displaying that new client is connected
+                // to server.  Trying to find the IP of the connected
+                String clientIpAddress = ((InetSocketAddress) client.getRemoteSocketAddress()).getAddress().toString();
+                System.out.printf("New client connected, remote addr: %s\n",clientIpAddress);
+                //System.out.printf("New client connected, inet: %s\n",client.getInetAddress());
+                //System.out.printf("New client connected: Host: %s\n",client.getInetAddress().getHostAddress());
+
+                // create a new thread object
+                ProxyHandler proxySock = new ProxyHandler(client);
+
+                // This thread will handle the client
+                // separately
+                new Thread(proxySock).start();
+            }
+        } catch (IOException e) {
+            System.out.println("Exception: ");
+            //e.printStackTrace();
+        } finally {
+            if (server != null) {
+                try {
+                    server.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+//************************************************************************************************* */
     private static void ParseCommandArgs(String[] args)
     {
         // quick out if no command line args

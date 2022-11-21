@@ -1,4 +1,4 @@
-import java.io.*;
+//import java.io.*;
 import java.util.*;
 
 public class GlobalInfo {
@@ -28,7 +28,7 @@ public class GlobalInfo {
     List<ServerEntry> entryList = new ArrayList<ServerEntry> (); 
     // 
     // ==== Experimental Code
-    Map<String,ServerEntry> proxyMap = new HashMap<>();
+    /*Map<String,ServerEntry> proxyMap = new HashMap<>();
     void setProxyEntry(String name, String IP, int portno)
     {
         ServerEntry entry = new ServerEntry(IP , portno);
@@ -39,7 +39,7 @@ public class GlobalInfo {
         ServerEntry entry = proxyMap.get(name);
         return Arrays.asList(entry.hostName, entry.portNumber);
     }
-        
+     */  // ============= End experimental code
     // private contstructor -- set all program defaults here
     private GlobalInfo()
     {
@@ -63,11 +63,19 @@ public class GlobalInfo {
     int getMode() {return mode;};
     void setMode(int m) 
     {   
-        if ((m < 0) || (m > 2)) {
+        if ((m < 0) || (m > 3)) {
             mode = 0;
             System.out.printf("Invalid Mode entered, set to %d\n",mode);
         } else {
             mode = m; 
+        }
+        if (!portSet) {   // set the default for the port according to how mode is set. 
+                          // for mode == 0 use default port of 8080
+            if (mode == 2)
+                portNo = 8090;
+            if (mode == 3)
+                portNo = 8081;
+
         }
            
     };
