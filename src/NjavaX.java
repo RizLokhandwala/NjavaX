@@ -32,6 +32,8 @@ public class NjavaX {
          * 2 -- It is the counter part running on the final server
          * NOTE (+) is to be added soon
          * 3(+)-- It is a local proxy -- set system settings to use this as a proxy
+         * 4(+)-- We can call this a direct proxy, that is a proxy for specific websites
+         *        It is implemented by connecting to specific port associated with a URL
          * NOTE: The config file will provide the mode and if in mode 1 a list of
          * IP address: port numbers
          * if in mode 2 it just provides a port number to listen
@@ -84,7 +86,9 @@ public class NjavaX {
         if (mode == 3) {
             runProxyServer();
         }
-        
+        if (mode == 4) {
+            runDirectProxy();
+        }
 
         try {
 
@@ -254,6 +258,10 @@ public class NjavaX {
                 }
             }
         }
+    }
+    private static void runDirectProxy()
+    {
+        
     }
 //************************************************************************************************* */
     private static void ParseCommandArgs(String[] args)

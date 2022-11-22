@@ -63,7 +63,7 @@ public class GlobalInfo {
     int getMode() {return mode;};
     void setMode(int m) 
     {   
-        if ((m < 0) || (m > 3)) {
+        if ((m < 0) || (m > 4)) {
             mode = 0;
             System.out.printf("Invalid Mode entered, set to %d\n",mode);
         } else {
