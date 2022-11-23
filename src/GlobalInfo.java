@@ -75,6 +75,9 @@ public class GlobalInfo {
                 portNo = 8090;
             if (mode == 3)
                 portNo = 8081;
+            if (mode == 4)
+                portNo = 9080;
+
 
         }
            
