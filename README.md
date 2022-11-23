@@ -25,4 +25,5 @@ Defaults are:
 - Mode 2: This is a simple web server that connects to the reverse proxy on the port number set in the instance running in mode 1.
 - Mode 3: (Note)This is proxy server where multiple domains are mapped through this server to specific IP/ports 
 - Mode 4: (Note)This is what we refer to as a direct proxy.  A port numnber is associated with a URL such that connection to a port will be forwarded to the desired URL
-Note: Not working yet
+  
+  Note: Not working yet
