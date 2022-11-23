@@ -23,5 +23,6 @@ Defaults are:
 - Mode 0: The program is a simple web server -- a web page is served up from the landing path
 - Mode 1: The program is a reverse proxy server -- the client is hidden from the server the client connects on "portno"  and another port is used to connect to a server.  Load balancing may be used.
 - Mode 2: This is a simple web server that connects to the reverse proxy on the port number set in the instance running in mode 1.
-- Mode 3: This is proxy server where multiple domains are mapped through this server to specific IP/ports 
-- Mode 4: This is what we refer to as a direct proxy.  A port numnber is associated with a URL such that connection to a port will be forwarded to the desired URL
+- Mode 3: (Note)This is proxy server where multiple domains are mapped through this server to specific IP/ports 
+- Mode 4: (Note)This is what we refer to as a direct proxy.  A port numnber is associated with a URL such that connection to a port will be forwarded to the desired URL
+Note: Not working yet
