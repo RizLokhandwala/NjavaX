@@ -20,7 +20,7 @@ import java.net.InetSocketAddress;
 public class NjavaX {
     public static ServerSocket server;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         
 
         /*
@@ -52,8 +52,60 @@ public class NjavaX {
     
         ParseCommandArgs(args);
         //
-        // Read config file here
-        //
+        // Read config file here FILEPATH: "./NjavaX.conf"
+        // Set Variables from Config File using ConfigReader
+        ConfigReader myConfigReader = new ConfigReader("./NjavaX.conf");
+
+        // set mode
+        List<String>temp = myConfigReader.get("mode"); // temp is reused for each of the variables
+        if (!(temp.get(0).equals("default"))) {
+            infoHolder.setMode(Integer.parseInt(temp.get(0)));
+        }
+
+        // set portNo
+        temp = myConfigReader.get("portNo");
+        if (!(temp.get(0).equals("default"))) {
+            infoHolder.setPortNo(Integer.parseInt(temp.get(0)));
+        }
+
+        // set landingPath
+        temp = myConfigReader.get("landingPath");
+        if (!(temp.get(0).equals("default"))) {
+            infoHolder.setLandingPath(temp.get(0));
+        }
+
+        // set wDrive
+        temp = myConfigReader.get("wDrive");
+        if(!(temp.get(0).equals("default"))) {
+            infoHolder.setWdrive(temp.get(0));
+        }
+
+        // set entryServers
+        temp = myConfigReader.get("entryList");
+        if (!(temp.get(0).equals("default"))) {
+            for (Integer i=0; i<temp.size()/2; i++) {
+                String[] firstArg = temp.get(2*i).split(":",2);
+                String[] secondArg = temp.get(2*i+1).split(":",2);
+
+                String tempHost = "";
+                Integer tempPort = -1;
+                if (firstArg[0].equalsIgnoreCase("hostName") && secondArg[0].equalsIgnoreCase("portNumber")) {
+                    tempHost = firstArg[1];
+                    tempPort = Integer.parseInt(secondArg[1]);
+                }
+                else if (firstArg[0].equalsIgnoreCase("portNumber") && secondArg[0].equalsIgnoreCase("hostName")) {
+                    tempPort = Integer.parseInt(firstArg[1]);
+                    tempHost = secondArg[1];
+                }
+                else {
+                    // WARNING
+                    System.out.println("WARNING: Must have a hostName and portNumber for each ServerEntry. Server was NOT added!");
+                }
+                if (tempPort != -1) {
+                    infoHolder.addServerEntry(tempHost, tempPort);
+                }
+            }
+        }
         //
         // now set new default mode 
         int mode = infoHolder.getMode();
@@ -71,6 +123,7 @@ public class NjavaX {
         System.out.printf("*  landing folder set to %s,\n",infoHolder.getLandingPath());
         System.out.println("*******************************************************************\n");
 
+        System.out.println();
         // DEBUG TEST of map in Global info
         /*infoHolder.setProxyEntry("googler", "144.0.0.1", 80);
         //List<Object> rvalue = infoHolder.getProxyEntry("googler");

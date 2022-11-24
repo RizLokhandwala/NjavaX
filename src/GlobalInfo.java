@@ -45,7 +45,7 @@ public class GlobalInfo {
     {
         // set defaults here
         mode = 0;
-        configPath = "./NjavaX.cnfg";
+        configPath = "./NjavaX.conf";
         landingPath = "/tmp/webpagefiles";
         wDrive = "";
         portSet = false;

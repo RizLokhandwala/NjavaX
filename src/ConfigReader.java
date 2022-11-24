@@ -1,100 +1,113 @@
 import java.io.*;
-//import java.util.Arrays;
 import java.util.List;
 import java.util.ArrayList;
-//import java.util.regex.Pattern;
-//import java.util.regex.Matcher;
 
 public class ConfigReader {
+    final static String COMMENT = "##"; // anything after this in NjavaX.conf will be considered a comment and not be read
+    static String configPath = "NjavaX.conf";
     public static GlobalInfo globalInfo;
 
     public static void main(String[] args) throws Exception
     {
-        List<String> testInfo = get("http");
-        for(Integer i = 0; i<testInfo.size(); i++) {
-            System.out.println(testInfo.get(i));
+        // If configFile is not found, create it.
+        File configFile = new File(configPath);
+        if (configFile.createNewFile()) {
+            System.out.println("Could not find a configFile, File Created: \"./" + configFile.getName() + "\"");
         }
-
-        List<String> user = get("user");
-        System.out.println(user.get(0));
+        else {
+            System.out.println("configFile already exists. FILEPATH: \"./" + configFile.getName() + "\"");
+        }
     }
 
-    public static List<String> get(String param) throws Exception
+    public ConfigReader(String confPath) {
+        configPath = confPath;
+    }
+
+    public List<String> get(String param) throws Exception
     {
         List<String> returnArgs = new ArrayList<String>();
 
         File configFile = new File(
-            "./NjavaX.conf");
+            configPath);
         
         BufferedReader configReader
             = new BufferedReader(new FileReader(configFile));
 
         String curLine;
+
+        // loop through configFile, find the correct paramteter
         while((curLine = configReader.readLine()) != null) {
-            String trimmedLine
-                = trimmer(curLine);
+
+            // make sure line is in correct format
+            String formattedLine
+                = format(curLine);
             
-            String[] args = trimmedLine.split(" ", 2);
-            if (args[0].equals(param)) {
-                if (args[1].equals("{")) {
-                    String newCurLine;
-                    while(!((newCurLine = configReader.readLine()).equals("}"))) {
-                        String newTrimmedLine
-                            = trimmer(newCurLine);
+            String[] args = formattedLine.split(" ", 2);
+                // args[0] is the variable name
+                // args[1] is the value
 
-                        String[] newArgs = newTrimmedLine.split(" ", 2);
-                        returnArgs.add(newArgs[0]+':'+newArgs[1]);
+            if (args[0].equalsIgnoreCase(param)) { // parameter found
+                
+                // if a list of values
+                if (args[1].equalsIgnoreCase("{")) { 
+                    // loop through list
+                    while((curLine = configReader.readLine()) != null) {
+                        formattedLine
+                            = format(curLine);
+                        
+                        // if empty line
+                        if (formattedLine.equalsIgnoreCase("")) {continue;}
+
+                        // if end of list of values
+                        if (formattedLine.equalsIgnoreCase("}")) {break;} 
+
+                        args = formattedLine.split(" ", 2);
+
+                        // if a list within a list
+                        if (args[1].equalsIgnoreCase("{")) {
+                            // loop through inner list
+                            while((curLine = configReader.readLine()) != null) {
+                                formattedLine 
+                                    = format(curLine);
+
+                                // if empty line
+                                if (formattedLine.equalsIgnoreCase("")) {continue;}
+                                
+                                // if end of inner list
+                                if (formattedLine.equalsIgnoreCase("}")) {break;}
+
+                                args = formattedLine.split(" ", 2);
+                                returnArgs.add(args[0]+':'+args[1]);
+                            }
+                        } // end of inner list
                     }
-                }
-                else {returnArgs.add(args[0]+':'+args[1]);}
-
+                } // end of outer list
+                else {returnArgs.add(args[1]);}
                 configReader.close();
                 return returnArgs;
             }
         }
 
+        // parameter was not found in configFile, return "defualt"
         returnArgs.add("default");
         configReader.close();
         return returnArgs;
     }
     
-    private static String trimmer(String untrimmed_line)
+    private static String format(String unformatted_line) // formats the line correctly and removes comments
     {
-        // remove spaces from beginning and end >> ex:  (  var value  ) -> (var value) 
+        String returnString;
+        // remove comments
+        returnString = unformatted_line.replaceAll(COMMENT+".*", "");
+
+        // remove spaces from beginning and end >> ex:  (  var value  ) -> (var value)
+        returnString = returnString.trim();
+
+        // add a space before {
+        returnString = returnString.replaceAll("\\{" , " \\{");
+
         // shrink remaining spaces down to one  >> ex:  (var     value) -> (var value)
-
-        String trimmedLine
-            = untrimmed_line.trim().replaceAll( "\\{" , " \\{").replaceAll(" +", " ");
-        return trimmedLine;
+        returnString = returnString.replaceAll(" +", " ");
+        return returnString;
     }
-
-    // regex instantiation
-    /*
-    private static String class_regex = "\\{";
-    private static String param_regex = " ";
-    private static Pattern class_pattern = Pattern.compile(class_regex);
-    private static Pattern param_pattern = Pattern.compile(param_regex);
-    
-    private static String parser(String trimmed_line)
-    {
-        if (trimmed_line.isEmpty()) {
-            return "empty";
-        }
-
-        Matcher class_matcher = class_pattern.matcher(trimmed_line);
-        Matcher param_matcher = param_pattern.matcher(trimmed_line);
-
-        if (class_matcher.find()) {
-            return "class";
-
-        }
-        else if (param_matcher.find()) {
-            return "param";
-        }
-        else {
-            return "invalid";
-        }
-
-    }
-    */
 }
