@@ -5,12 +5,13 @@
  * Read the full article https://dev.to/mateuszjarzyna/build-your-own-http-server-in-java-in-less-than-one-hour-only-get-method-2k02
  *
  * GAT -- I have made this multithreaded
+ * Now it is the complete driver program for all modes
  */
 import java.io.*;
 import java.util.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketAddress;
+//import java.net.SocketAddress;
 import java.net.InetSocketAddress;
 
 //import java.nio.file.Files;
@@ -160,7 +161,7 @@ public class NjavaX {
                 // socket object to receive incoming client
                 // requests
                 if (mode == 0)
-                    System.out.println("WEb server before accept");
+                    System.out.println("Web server before accept");
                 else
                     System.out.printf("Proxy partner before accept on port no: %d\n", portno);
                 Socket client = server.accept();

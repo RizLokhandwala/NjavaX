@@ -15,11 +15,9 @@ public class GlobalInfo {
 
     // tuple class -- these are entries of the server list for load balancing
     private class ServerEntry {
-        public int flag;
         public String hostName;
         public int portNumber;
         public ServerEntry(String hn, int pn) {
-            flag = 0;
             hostName = hn;
             portNumber = pn;
         }
@@ -71,12 +69,15 @@ public class GlobalInfo {
         }
         if (!portSet) {   // set the default for the port according to how mode is set. 
                           // for mode == 0 use default port of 8080
-            if (mode == 2)
+            if (mode == 2) {
                 portNo = 8090;
-            if (mode == 3)
+            } else if (mode == 3) {
                 portNo = 8081;
-            if (mode == 4)
+            } else if (mode == 4) {
                 portNo = 9080;
+            } else {
+                portNo = 8080;
+            }
 
 
         }
