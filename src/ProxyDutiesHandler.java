@@ -9,6 +9,7 @@ import java.net.Socket;
 //import java.util.ArrayList;
 //import java.util.List;
 
+// This actually handles the reverse proxy
 public class ProxyDutiesHandler implements Runnable {
 	private final Socket client;
 	private Socket topartner;

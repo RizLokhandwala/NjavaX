@@ -50,7 +50,7 @@ public class NjavaX {
             infoHolder.setWdrive("C:");
         }
     
-        ParseCommandArgs(args);
+       
         //
         // Read config file here FILEPATH: "./NjavaX.conf"
         // Set Variables from Config File using ConfigReader
@@ -107,8 +107,12 @@ public class NjavaX {
             }
         }
         //
+        // config file may be overridden with command line
+        int dbmode = infoHolder.getMode();
+        ParseCommandArgs(args);
         // now set new default mode 
         int mode = infoHolder.getMode();
+        System.out.printf(" mode %d, dbmode %d\n",mode, dbmode);
 
         // if mode == 2, and port number has not been set -- set it to 8090;
         // if it has been set, or if mode is not 2, then just return the port number.
@@ -140,9 +144,9 @@ public class NjavaX {
             runProxyServer();
         }
         if (mode == 4) {
-            runDirectProxy();
+            runSpecificProxy();
         }
-
+        // mode 0 or 2
         try {
 
             // server is listening on port 8080
@@ -190,6 +194,7 @@ public class NjavaX {
 
     }
 //************************************************************************************************* */
+//  Mode 1
     private static void runReverseProxyServer() {
 
         GlobalInfo infoHolder = GlobalInfo.getInstance();
@@ -263,7 +268,8 @@ public class NjavaX {
         }
 
     }
-//************************************************************************************************* */
+// ************************************************************************************************* */
+// Mode 3
     private static void runProxyServer() 
     {
         GlobalInfo infoHolder = GlobalInfo.getInstance();
@@ -273,6 +279,7 @@ public class NjavaX {
 
             // server is listening on port 8080
             server = new ServerSocket(portNo);
+            System.out.printf(" in runProxyserver, Port: %d",portNo);
             // server.setReuseAddress(true);
 
             // running infinite loop for getting
@@ -312,8 +319,51 @@ public class NjavaX {
             }
         }
     }
-    private static void runDirectProxy()
+    // ************************************************************************************************* */
+    // Mode 4
+    private static void runSpecificProxy()
     {
+        GlobalInfo infoHolder = GlobalInfo.getInstance();
+        int portNo = infoHolder.getPortno();
+        try {
+
+            // server is listening on various ports
+            server = new ServerSocket(portNo);
+            // server.setReuseAddress(true);
+
+            // running infinite loop for getting
+            // client request
+            while (true) {
+
+                // socket object to receive incoming client
+                // requests
+               
+                System.out.printf("Proxy server (specific) before accept on port no: %d\n", portNo);
+                Socket client = server.accept();
+
+                // Displaying that new client is connected
+                // to server.  Trying to find the IP of the connected
+                String clientIpAddress = ((InetSocketAddress) client.getRemoteSocketAddress()).getAddress().toString();
+                System.out.printf("New client connected, remote addr: %s\n",clientIpAddress);
+
+                ProxyHandler ProxySocket = new ProxyHandler(client);
+
+                // This thread will handle the client
+                // separately
+                new Thread(ProxySocket).start();
+            }
+        } catch (IOException e) {
+            System.out.println("Exception: ");
+            //e.printStackTrace();
+        } finally {
+            if (server != null) {
+                try {
+                    server.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
         
     }
 //************************************************************************************************* */
