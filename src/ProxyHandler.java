@@ -5,24 +5,24 @@ import java.io.*;
 import java.net.Socket;
 import java.net.URL;
 import java.net.URLConnection;  
-import java.net.HttpURLConnection;
+//import java.net.HttpURLConnection;
 import java.net.InetAddress;
 
 
 //import java.nio.file.Files;
 //import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
+//import java.nio.file.Paths;
+//import java.util.ArrayList;
+//import java.util.List;
 
 public class ProxyHandler implements Runnable {
 	static int instanceCount = 0;
 	private final Socket client;
-	private Socket totarget = null;
-	int mode = 0;
+	private final Socket totarget = null;
+
 
 	// Constructor
-	public ProxyHandler(Socket socket) 
+	public ProxyHandler(Socket socket, int port) 
 	{
 		this.client = socket;
 		instanceCount = instanceCount + 1;
@@ -79,7 +79,8 @@ public class ProxyHandler implements Runnable {
 
 
 			// Get actual IP associated with this URL through DNS
-			InetAddress address = InetAddress.getByName("http://www.javatpoint.com/java-http-proxy-server" );
+			InetAddress address = InetAddress.getByName("www.javatpoint.com" );
+			System.out.printf(" InetAddress is %s\n",address);
 
 
 			URLConnection connection = url.openConnection();
@@ -89,7 +90,7 @@ public class ProxyHandler implements Runnable {
 
 			System.out.println(" after urlconnection connect");
 			
-			final InputStream InputStreamptarget = connection.getInputStream();
+			//final InputStream InputStreamptarget = connection.getInputStream();
         	//PrintWriter writer = new PrintWriter(connection.getOutputStream());
 			final OutputStream OutputStreamtarget = connection.getOutputStream();
 			final InputStream InputStreamTarget = connection.getInputStream();
