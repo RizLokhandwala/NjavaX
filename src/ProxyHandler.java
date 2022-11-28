@@ -184,7 +184,7 @@ public class ProxyHandler implements Runnable {
 				System.out.println(e.toString());
 		} finally {
 			try {
-				System.out.println(" ++++++++++closing up shop";
+				System.out.println(" ++++++++++closing up shop");
 				if (out != null) {
 				out.close();
 				}
