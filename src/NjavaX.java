@@ -305,7 +305,7 @@ public class NjavaX {
                 //System.out.printf("New client connected: Host: %s\n",client.getInetAddress().getHostAddress());
 
                 // create a new thread object
-                ProxyHandler proxySock = new ProxyHandler(client);
+                ProxyHandler proxySock = new ProxyHandler(client, portNo);
 
                 // This thread will handle the client
                 // separately
@@ -351,7 +351,7 @@ public class NjavaX {
                 String clientIpAddress = ((InetSocketAddress) client.getRemoteSocketAddress()).getAddress().toString();
                 System.out.printf("New client connected, remote addr: %s\n",clientIpAddress);
 
-                ProxyHandler ProxySocket = new ProxyHandler(client);
+                ProxyHandler ProxySocket = new ProxyHandler(client, portNo);
 
                 // This thread will handle the client
                 // separately

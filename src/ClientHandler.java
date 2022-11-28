@@ -67,10 +67,10 @@ public class ClientHandler implements Runnable {
 			String request = requestBuilder.toString();
 			String[] requestsLines = request.split("\r\n");
 			String[] requestLine = requestsLines[0].split(" ");
-			String method = requestLine[0];
+			//String method = requestLine[0];
 			String path = requestLine[1];
 			String version = requestLine[2];
-			String host = requestsLines[1].split(" ")[1];
+			//String host = requestsLines[1].split(" ")[1];
 
 			List<String> headers = new ArrayList<>();
 			for (int h = 2; h < requestsLines.length; h++) {
