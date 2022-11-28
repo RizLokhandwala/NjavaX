@@ -14,6 +14,7 @@ public class ClientHandler implements Runnable {
 	private final Socket client;
 	private String wDrive;
 	int mode = 0;
+	private int portNo;
 
 	// Constructor
 	public ClientHandler(Socket socket, int mde, String WDrive) 
@@ -23,6 +24,17 @@ public class ClientHandler implements Runnable {
 		this.mode = mde;
 		instanceCount = instanceCount + 1;
 	}
+	/********************************/
+	/******* Quick n' Dirtier *******/
+	public ClientHandler(Socket socket, int mde, String WDrive, int portNo) 
+	{
+		this.client = socket;
+		this.wDrive = WDrive;
+		this.mode = mde;
+		instanceCount = instanceCount + 1;
+		this.portNo = portNo;
+	}
+	/********************************/
 
 	public void run()
 	{
@@ -75,19 +87,32 @@ public class ClientHandler implements Runnable {
 			String directory = infoHolder.getWdrive() +   infoHolder.getLandingPath();
 			///System.out.printf("------->DEBUG directory: %s,\n",directory);
 
-			Path filePath = getFilePath(directory, path);
-			System.out.print(" file path to check: ");
-			System.out.println(filePath);
-			if (Files.exists(filePath)) {
-				// file exist
-				String contentType = guessContentType(filePath);
-				sendResponse(client, "200 OK", contentType, Files.readAllBytes(filePath));
-			} else {
-				// 404
-				byte[] notFoundContent = "<h1>File Not found :(</h1>".getBytes();
-				sendResponse(client, "404 Not Found", "text/html", notFoundContent);
+			/************************************/
+			/********** Quick n' Dirty **********/
+
+			if (path.equalsIgnoreCase("/hello")) {
+				System.out.println("*************\n");
+				System.out.println(portNo);
+				System.out.println("*************\n");
+				String textResponse = "Hello from port " + String.valueOf(portNo);
+				sendTextResponse(client, "200 OK", textResponse);
 			}
-			
+			/************************************/
+			else
+			{
+				Path filePath = getFilePath(directory, path);
+				System.out.print(" file path to check: ");
+				System.out.println(filePath);
+				if (Files.exists(filePath)) {
+					// file exist
+					String contentType = guessContentType(filePath);
+					sendResponse(client, "200 OK", contentType, Files.readAllBytes(filePath));
+				} else {
+					// 404
+					byte[] notFoundContent = "<h1>File Not found :(</h1>".getBytes();
+					sendResponse(client, "404 Not Found", "text/html", notFoundContent);
+				}
+			}
 			
 		} catch (IOException e) {
 			System.out.println(" IO Exception");
@@ -118,6 +143,17 @@ public class ClientHandler implements Runnable {
 		clientOutput.write("\r\n\r\n".getBytes());
 		clientOutput.flush();
 		client.close();
+	}
+
+	private static void sendTextResponse(Socket client, String status, String text)
+			throws IOException {
+		System.out.println(" > ****** SendResponse Called");
+		OutputStream clientOutput = client.getOutputStream();
+		clientOutput.write(("HTTP/1.1 200 OK\r\n").getBytes());
+		clientOutput.write(("\r\n").getBytes());
+		clientOutput.write(text.getBytes());
+		//clientOutput.write("\r\n\r\n".getBytes());
+		clientOutput.flush();
 	}
 
 	/*

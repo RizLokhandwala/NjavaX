@@ -174,7 +174,7 @@ public class NjavaX {
                 //System.out.printf("New client connected: Host: %s\n",client.getInetAddress().getHostAddress());
 
                 // create a new thread object
-                ClientHandler clientSock = new ClientHandler(client, mode, wDrive);
+                ClientHandler clientSock = new ClientHandler(client, mode, wDrive, portno);
 
                 // This thread will handle the client
                 // separately
@@ -208,10 +208,10 @@ public class NjavaX {
         if (infoHolder.getNumServerEntries() > 1) {
             isLoadBalance = true;
         }
-        if (infoHolder.getNumServerEntries() == 1) { // no servers entered at all
-            // REMOVE THIS CODE AND REPLACE WITH GET FROM GLOBALINFO
-            pIP = "localhost"; // IP address of partner (this program on server)
-            pPort = 8090;
+        if (infoHolder.getNumServerEntries() == 1) { // only one webserver entry
+            List<Object> tmpEntry = infoHolder.getEntry(0);
+            pIP = tmpEntry.get(0).toString(); // IP address of partner (this program on server)
+            pPort = Integer.parseInt(tmpEntry.get(1).toString());
         }
         //String wDrive = infoHolder.getWdrive();
         try {            
@@ -246,8 +246,12 @@ public class NjavaX {
                  *      First select a server to send to...
                  *      May be round robin, or may be based on header info 
                  * 
-                 */
-                
+                */
+                int nextServerIndex = infoHolder.getNextIndex();
+                List<Object> tmpEntry = infoHolder.getEntry(nextServerIndex);
+                pIP = tmpEntry.get(0).toString();
+                pPort = Integer.parseInt(tmpEntry.get(1).toString());
+
                 // create a new thread object
                 ProxyDutiesHandler ProxySock = new ProxyDutiesHandler(client, pIP, pPort);
 

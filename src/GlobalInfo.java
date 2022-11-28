@@ -12,11 +12,12 @@ public class GlobalInfo {
     private String configPath;      // path to read configuration file -- this is a command line argument
     private String landingPath;     //++ path for landing file -- used in Mode=0, and Mode=2
     private String wDrive;          // for windows we can specify files not found on "C" drive.
-
+    private Boolean leastUsedAlgorithm;
     // tuple class -- these are entries of the server list for load balancing
     private class ServerEntry {
         public String hostName;
         public int portNumber;
+        public int numActiveUsers = 0;
         public ServerEntry(String hn, int pn) {
             hostName = hn;
             portNumber = pn;
@@ -24,6 +25,8 @@ public class GlobalInfo {
     }
     //++ This is the list for load balancing
     List<ServerEntry> entryList = new ArrayList<ServerEntry> (); 
+    public int lastUsedIndex; // keeps track of last used server for round robin algorithm
+
     // 
     // ==== Experimental Code
     /*Map<String,ServerEntry> proxyMap = new HashMap<>();
@@ -48,6 +51,7 @@ public class GlobalInfo {
         wDrive = "";
         portSet = false;
         portNo = 8080;
+        leastUsedAlgorithm = false;
     }
     // the sigleton
     public static GlobalInfo getInstance()
@@ -91,6 +95,7 @@ public class GlobalInfo {
     void setLandingPath(String path) {landingPath = path;return;}
     String getWdrive() {return wDrive;}
     void setWdrive(String d) {wDrive = d;return;}
+    void setLeastUsedAlgorithm(Boolean b) {leastUsedAlgorithm = b;return;}
 
     // list of servers
 
@@ -103,6 +108,30 @@ public class GlobalInfo {
     List<Object> getEntry(int index) {
         ServerEntry entry = entryList.get(index);
         return Arrays.asList(entry.hostName, entry.portNumber);
+    }
+    int getNextIndex() {
+        if (!leastUsedAlgorithm) { // using ROUND ROBIN ALGORITHM
+            if (lastUsedIndex == entryList.size()-1) {
+                lastUsedIndex = 0;
+                return 0;
+            }
+            else {
+                lastUsedIndex++;
+                return lastUsedIndex;
+            }
+        }
+        else { // using LEAST USED ALGORITHM
+            int leastUsedIndex = 0;
+            for (int i = 1; i < entryList.size(); i++) {
+                int curIndexUsers = entryList.get(leastUsedIndex).numActiveUsers;
+                int nextIndexUsers = entryList.get(i).numActiveUsers;
+                if (curIndexUsers > nextIndexUsers) {
+                    leastUsedIndex = i;
+                }
+            }
+            entryList.get(leastUsedIndex).numActiveUsers++;
+            return leastUsedIndex;
+        }
     }
 
     // if the port has not been set and the mode is one the default is 8090
